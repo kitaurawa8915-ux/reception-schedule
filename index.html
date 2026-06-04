@@ -103,30 +103,26 @@ table.staff td.na{color:#ccc;font-size:11px;}
   <div class="card">
     <div class="card-title"><span class="num">3</span>先月の実績 ＆ 土曜年間累計</div>
     <div class="ext-row">
-      <a class="btn-ext btn-drive"
-         href="https://drive.google.com/drive/folders/18rd2sDzC1F6Z1MvzI4baPi3gsoOPEz1k"
+      <a class="btn-ext btn-gem"
+         href="https://gemini.google.com/gem/cc4662ec277d"
          target="_blank" rel="noopener noreferrer">
-        <!-- Google Drive アイコン -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white">
-          <path d="M4.5 20l4-7H2l4 7h-1.5zm3-7L12 5.5 15.5 13H7.5zm9 0l4 7H9l4-7h3zm-3-7.5L7.5 13h9L13.5 5.5z"/>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
         </svg>
-        Google Drive で実績ファイルを確認する
+        Gemで実績を変換する
       </a>
-      <span class="ext-hint">↑ 数字を確認して下の表に転記</span>
+      <span class="ext-hint">↑ 集計表の画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
     </div>
-    <p class="hint">先月の集計表と土曜年間累計から数字を転記してください。</p>
-    <table class="staff">
-      <thead>
-        <tr>
-          <th class="l">スタッフ</th>
-          <th>先月<br>受付回数</th>
-          <th>先月<br>負荷量</th>
-          <th>年間土曜<br>受付回数</th>
-          <th>年間<br>残り番回数</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+    <p class="hint">Gemが出力したテキストをそのまま貼り付けてください。</p>
+    <textarea id="jisseki" placeholder="■ 荒井
+* 先月受付回数: 3
+* 先月負荷量: 2.5
+■ 関根
+* 先月受付回数: 2
+* 先月負荷量: 2
+* 年間土曜受付回数: 1
+* 年間残り番回数: 1
+..."></textarea>
   </div>
 
   <!-- 生成ボタン -->
@@ -148,47 +144,11 @@ table.staff td.na{color:#ccc;font-size:11px;}
 </div>
 
 <script>
-const STAFF = [
-  {name:'荒井', sat:false},
-  {name:'関根', sat:true},
-  {name:'目黒', sat:true},
-  {name:'久保', sat:true},
-  {name:'新井', sat:true},
-  {name:'内田', sat:true},
-  {name:'森田', sat:true},
-  {name:'大貫', sat:true},
-  {name:'宮田', sat:true},
-  {name:'遠藤', sat:true},
-];
-
-(function buildTable(){
-  const tb = document.getElementById('tbody');
-  STAFF.forEach(s => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="name">${s.name}</td>
-      <td><input type="number" id="${s.name}-c" value="0" min="0" max="10"></td>
-      <td><input type="number" id="${s.name}-l" value="0" min="0" max="10" step="0.5"></td>
-      ${s.sat
-        ? `<td><input type="number" id="${s.name}-s" value="0" min="0" max="30"></td>
-           <td><input type="number" id="${s.name}-n" value="0" min="0" max="30"></td>`
-        : `<td class="na">—</td><td class="na">—</td>`}
-    `;
-    tb.appendChild(tr);
-  });
-})();
 
 function buildPrompt() {
   const month = document.getElementById('month').value.trim();
   const kinmu = document.getElementById('kinmu').value.trim();
-  const lines = STAFF.map(s => {
-    const c = document.getElementById(s.name+'-c').value || 0;
-    const l = document.getElementById(s.name+'-l').value || 0;
-    const sat = s.sat
-      ? `　年間土曜受付回数:${document.getElementById(s.name+'-s').value||0}　年間残り番回数:${document.getElementById(s.name+'-n').value||0}`
-      : '　（土曜担当対象外）';
-    return `${s.name}　先月受付回数:${c}　先月負荷量:${l}${sat}`;
-  }).join('\n');
+  const jisseki = document.getElementById('jisseki').value.trim();
 
   return `以下の情報をもとに、${month}の受付担当表を作成してください。
 
@@ -196,7 +156,7 @@ function buildPrompt() {
 ${kinmu}
 
 【先月の平日受付実績・土曜年間累計】
-${lines}
+${jisseki}
 
 【固定ルール】
 ■ スタッフ情報
@@ -278,8 +238,10 @@ function openClaude() {
   err.className = 'err';
   const month = document.getElementById('month').value.trim();
   const kinmu = document.getElementById('kinmu').value.trim();
+  const jisseki = document.getElementById('jisseki').value.trim();
   if (!month) { err.textContent = '対象月を入力してください。'; err.className = 'err show'; return; }
   if (!kinmu) { err.textContent = '勤務表を貼り付けてください。'; err.className = 'err show'; return; }
+  if (!jisseki) { err.textContent = '先月の実績テキストを貼り付けてください。'; err.className = 'err show'; return; }
 
   const prompt = buildPrompt();
   const url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
