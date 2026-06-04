@@ -125,6 +125,16 @@ table.staff td.na{color:#ccc;font-size:11px;}
 ..."></textarea>
   </div>
 
+  <!-- ④ 特記事項 -->
+  <div class="card">
+    <div class="card-title"><span class="num">4</span>今月の特記事項・調整依頼（任意）</div>
+    <p class="hint">固定ルールより優先して反映されます。記載がない場合は空欄のままで構いません。</p>
+    <textarea id="biko" style="min-height:100px;" placeholder="例：
+・宮田・久保は外勤があるため今月の受付担当は1回までに抑える
+・新井を優先的に土曜担当にしてほしい
+・森田は体調不良のため今月は負担を軽くする"></textarea>
+  </div>
+
   <!-- 生成ボタン -->
   <button class="btn-main" id="btn" onclick="openClaude()">
     Claude でそのまま担当表を作成する →
@@ -149,9 +159,14 @@ function buildPrompt() {
   const month = document.getElementById('month').value.trim();
   const kinmu = document.getElementById('kinmu').value.trim();
   const jisseki = document.getElementById('jisseki').value.trim();
+  const biko = document.getElementById('biko').value.trim();
+
+  const bikoSection = biko
+    ? `\n【今月の特記事項・調整依頼】（以下は固定ルールより優先して反映してください）\n${biko}\n`
+    : '';
 
   return `以下の情報をもとに、${month}の受付担当表を作成してください。
-
+${bikoSection}
 【勤務表】
 ${kinmu}
 
@@ -184,7 +199,7 @@ ${jisseki}
 ■ 平日PM受付
 ・PM受付は常に佐藤以外が担当
 ・佐藤が17:45まで勤務の日は負荷0.5
-・金曜のPM受付は男性スタッフのみ
+・金曜のPM受付は男性スタッフのみ（女性スタッフは金曜PM担当不可）
 ・短時間受付(0.5)が特定スタッフに偏らないよう配慮
 
 ■ 土曜受付
@@ -208,8 +223,9 @@ ${jisseki}
 
 ■ 割り当て全般
 ・受付担当・残り番ともに出勤日のみ割り当て可能
-・同一スタッフの受付担当は週1回まで（佐藤は対象外）
+・同一スタッフの受付担当は同一週（月〜土）内に1回まで（佐藤は対象外）
 ・前週と同じ曜日の担当にならないようにする（佐藤は対象外）
+・連日（前日または翌日）に同じスタッフを受付担当にしない
 ・同一スタッフが同日にAM受付とPM受付を両方担当しない
 
 ■ 作成手順（必ず守ること）
@@ -231,7 +247,11 @@ ${jisseki}
 ■ 自己チェック（出力後に必ず確認）
 ・受付回数0回のスタッフがいる場合、理由（全日休みか割り当てミスか）を明記する
 ・各スタッフの出勤日数と受付回数の比率が極端に偏っていないか確認する
-・月3回・負荷3.0の上限を超えているスタッフがいないか確認する`;
+・月3回・負荷3.0の上限を超えているスタッフがいないか確認する
+・金曜PMに女性スタッフ（目黒・遠藤・大貫）が割り当てられていないか確認する
+・同一週（月〜土）内に同じスタッフが2回以上受付担当になっていないか確認する
+・連日で同じスタッフが受付担当になっていないか確認する
+・佐藤が土曜受付2回目の日の残り番が佐藤以外になっているか確認する`;
 }
 
 function openClaude() {
