@@ -19,12 +19,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .num{width:22px;height:22px;background:#2e7d32;color:#fff;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
 .hint{font-size:12px;color:#888;margin-bottom:12px;line-height:1.7;}
 
-/* Gemボタン */
-.gem-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.btn-gem{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:background 0.15s;}
-.btn-gem:hover{background:#1558c0;}
-.btn-gem svg{width:15px;height:15px;flex-shrink:0;}
-.gem-hint{font-size:11px;color:#888;}
+/* 外部リンクボタン共通 */
+.ext-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.btn-ext{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity 0.15s;white-space:nowrap;}
+.btn-ext:hover{opacity:0.82;}
+.btn-ext svg{width:15px;height:15px;flex-shrink:0;}
+.btn-gem{background:#1a73e8;color:#fff;}
+.btn-drive{background:#34a853;color:#fff;}
+.ext-hint{font-size:11px;color:#888;}
 
 input[type=text]{font-size:13px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#1a1a1a;outline:none;width:220px;}
 input[type=text]:focus{border-color:#2e7d32;background:#fff;}
@@ -73,18 +75,18 @@ table.staff td.na{color:#ccc;font-size:11px;}
   <!-- ② 勤務表 -->
   <div class="card">
     <div class="card-title"><span class="num">2</span>勤務表</div>
-
-    <div class="gem-row">
-      <a class="btn-gem" href="https://gemini.google.com/gem/1gfP2szCGStxbQgmN8ZSn8AS116F0XAOY" target="_blank" rel="noopener noreferrer">
-        <!-- Gemini ロゴ風アイコン -->
+    <div class="ext-row">
+      <a class="btn-ext btn-gem"
+         href="https://gemini.google.com/gem/1gfP2szCGStxbQgmN8ZSn8AS116F0XAOY"
+         target="_blank" rel="noopener noreferrer">
+        <!-- Gemini アイコン -->
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white" opacity="0.9"/>
+          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
         </svg>
         Gemで勤務表を変換する
       </a>
-      <span class="gem-hint">↑ 勤務表の画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
+      <span class="ext-hint">↑ 画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
     </div>
-
     <p class="hint">Gemで変換したテキストをそのまま貼り付けてください。</p>
     <textarea id="kinmu" placeholder="荒井
 6/1 ○
@@ -100,6 +102,18 @@ table.staff td.na{color:#ccc;font-size:11px;}
   <!-- ③ 実績入力 -->
   <div class="card">
     <div class="card-title"><span class="num">3</span>先月の実績 ＆ 土曜年間累計</div>
+    <div class="ext-row">
+      <a class="btn-ext btn-drive"
+         href="https://drive.google.com/drive/folders/18rd2sDzC1F6Z1MvzI4baPi3gsoOPEz1k"
+         target="_blank" rel="noopener noreferrer">
+        <!-- Google Drive アイコン -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white">
+          <path d="M4.5 20l4-7H2l4 7h-1.5zm3-7L12 5.5 15.5 13H7.5zm9 0l4 7H9l4-7h3zm-3-7.5L7.5 13h9L13.5 5.5z"/>
+        </svg>
+        Google Drive で実績ファイルを確認する
+      </a>
+      <span class="ext-hint">↑ 数字を確認して下の表に転記</span>
+    </div>
     <p class="hint">先月の集計表と土曜年間累計から数字を転記してください。</p>
     <table class="staff">
       <thead>
@@ -116,22 +130,19 @@ table.staff td.na{color:#ccc;font-size:11px;}
   </div>
 
   <!-- 生成ボタン -->
-  <button class="btn-main" id="btn" onclick="copyPrompt()">
-    プロンプトをコピーして Claude に貼り付ける
+  <button class="btn-main" id="btn" onclick="openClaude()">
+    Claude でそのまま担当表を作成する →
   </button>
   <div class="err" id="err"></div>
 
-  <!-- コピー後の案内 -->
+  <!-- 開いた後の案内 -->
   <div class="step-box" id="step-box">
-    <h3>✅ コピーしました！次の手順</h3>
+    <h3>✅ Claude.ai が開きました！</h3>
     <ol>
-      <li>Claude.ai を開く</li>
-      <li>新しいチャットにそのまま貼り付けて送信（Ctrl+V / Cmd+V）</li>
+      <li>プロンプトがチャット欄に入力済みです</li>
+      <li>送信ボタン（↑）を押すだけで担当表が作成されます</li>
       <li>生成された担当表をコピーして Excel / スプレッドシートへ</li>
     </ol>
-    <a class="btn-claude" href="https://claude.ai" target="_blank" rel="noopener noreferrer">
-      Claude.ai を開く →
-    </a>
   </div>
 
 </div>
@@ -262,7 +273,7 @@ ${lines}
 ・月3回・負荷3.0の上限を超えているスタッフがいないか確認する`;
 }
 
-function copyPrompt() {
+function openClaude() {
   const err = document.getElementById('err');
   err.className = 'err';
   const month = document.getElementById('month').value.trim();
@@ -270,19 +281,18 @@ function copyPrompt() {
   if (!month) { err.textContent = '対象月を入力してください。'; err.className = 'err show'; return; }
   if (!kinmu) { err.textContent = '勤務表を貼り付けてください。'; err.className = 'err show'; return; }
 
-  navigator.clipboard.writeText(buildPrompt()).then(() => {
-    const btn = document.getElementById('btn');
-    btn.textContent = 'コピーしました！ → Claude.ai に貼り付けてください';
-    btn.className = 'btn-main done';
-    document.getElementById('step-box').style.display = 'block';
-    setTimeout(() => {
-      btn.textContent = 'プロンプトをコピーして Claude に貼り付ける';
-      btn.className = 'btn-main';
-    }, 5000);
-  }).catch(() => {
-    err.textContent = 'コピーに失敗しました。ブラウザのクリップボード許可を確認してください。';
-    err.className = 'err show';
-  });
+  const prompt = buildPrompt();
+  const url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
+  window.open(url, '_blank', 'noopener,noreferrer');
+
+  const btn = document.getElementById('btn');
+  btn.textContent = '✅ Claude.ai を開きました';
+  btn.className = 'btn-main done';
+  document.getElementById('step-box').style.display = 'block';
+  setTimeout(() => {
+    btn.textContent = 'Claude でそのまま担当表を作成する →';
+    btn.className = 'btn-main';
+  }, 5000);
 }
 </script>
 </body>
