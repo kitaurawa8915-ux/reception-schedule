@@ -19,7 +19,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .num{width:22px;height:22px;background:#2e7d32;color:#fff;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
 .hint{font-size:12px;color:#888;margin-bottom:12px;line-height:1.7;}
 
-/* 外部リンクボタン共通 */
 .ext-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
 .btn-ext{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity 0.15s;white-space:nowrap;}
 .btn-ext:hover{opacity:0.82;}
@@ -32,15 +31,6 @@ input[type=text]{font-size:13px;padding:8px 12px;border:1px solid #ddd;border-ra
 input[type=text]:focus{border-color:#2e7d32;background:#fff;}
 textarea{width:100%;font-size:12px;font-family:'Courier New',monospace;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#1a1a1a;resize:vertical;min-height:160px;line-height:1.7;outline:none;}
 textarea:focus{border-color:#2e7d32;background:#fff;}
-input[type=number]{width:62px;font-size:13px;padding:5px 6px;border:1px solid #ddd;border-radius:6px;background:#fafafa;color:#1a1a1a;text-align:center;outline:none;}
-input[type=number]:focus{border-color:#2e7d32;}
-
-table.staff{width:100%;border-collapse:collapse;font-size:12px;}
-table.staff th{background:#f5f5f3;padding:8px 10px;text-align:center;font-weight:500;color:#666;border-bottom:1px solid #e5e5e5;font-size:11px;}
-table.staff th.l{text-align:left;}
-table.staff td{padding:6px 10px;border-bottom:1px solid #f0f0ee;text-align:center;vertical-align:middle;}
-table.staff td.name{text-align:left;font-weight:500;}
-table.staff td.na{color:#ccc;font-size:11px;}
 
 .btn-main{width:100%;padding:15px;font-size:15px;font-weight:600;border:none;border-radius:10px;background:#2e7d32;color:#fff;cursor:pointer;transition:background 0.15s,transform 0.1s;margin-top:4px;}
 .btn-main:hover{background:#256427;}
@@ -50,11 +40,11 @@ table.staff td.na{color:#ccc;font-size:11px;}
 .step-box{background:#e8f4e8;border:1px solid #c8e6c9;border-radius:10px;padding:16px 20px;margin-top:16px;display:none;}
 .step-box h3{font-size:13px;font-weight:600;color:#2e7d32;margin-bottom:10px;}
 .step-box ol{padding-left:18px;font-size:13px;color:#333;line-height:2.4;}
-.btn-claude{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 18px;background:#fff;border:1px solid #c8e6c9;border-radius:8px;font-size:13px;color:#2e7d32;text-decoration:none;font-weight:500;}
-.btn-claude:hover{background:#e8f4e8;}
 
 .err{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;color:#c0392b;font-size:12px;margin-top:10px;display:none;}
 .err.show{display:block;}
+
+/* 変更点ハイライト用（開発確認用・本番では外してOK） */
 </style>
 </head>
 <body>
@@ -79,7 +69,6 @@ table.staff td.na{color:#ccc;font-size:11px;}
       <a class="btn-ext btn-gem"
          href="https://gemini.google.com/gem/1gfP2szCGStxbQgmN8ZSn8AS116F0XAOY"
          target="_blank" rel="noopener noreferrer">
-        <!-- Gemini アイコン -->
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
         </svg>
@@ -147,19 +136,18 @@ table.staff td.na{color:#ccc;font-size:11px;}
     <ol>
       <li>プロンプトがチャット欄に入力済みです</li>
       <li>送信ボタン（↑）を押すだけで担当表が作成されます</li>
-      <li>生成された担当表をコピーして Excel / スプレッドシートへ</li>
+      <li>生成された担当表をそのまま確認・共有できます</li>
     </ol>
   </div>
 
 </div>
 
 <script>
-
 function buildPrompt() {
-  const month = document.getElementById('month').value.trim();
-  const kinmu = document.getElementById('kinmu').value.trim();
+  const month  = document.getElementById('month').value.trim();
+  const kinmu  = document.getElementById('kinmu').value.trim();
   const jisseki = document.getElementById('jisseki').value.trim();
-  const biko = document.getElementById('biko').value.trim();
+  const biko   = document.getElementById('biko').value.trim();
 
   const bikoSection = biko
     ? `\n【今月の特記事項・調整依頼】（以下は固定ルールより優先して反映してください）\n${biko}\n`
@@ -189,7 +177,9 @@ ${jisseki}
 ・AM半日＝午前のみ勤務（AM受付可・PM受付不可）
 ・PM半日＝午後のみ勤務（AM受付不可・PM受付可）
 ・AM(12:45)＝平日は午前・午後ともに受付不可。土曜日のみ受付可
-・17:45まで＝佐藤のみ。AM受付可・PM受付は他スタッフが担当（負荷0.5）
+・17:45まで＝佐藤のみの特殊勤務区分。AM受付可・PM受付は他スタッフが担当（負荷0.5）
+  ※「AM半日」「AM(12:45)」など他の勤務種別とは別物。勤務表に「17:45まで」と明記された日のみ適用。
+  ※「AM半日」の日のPM受付は短時間(0.5)ではなく通常の負荷1.0として扱う。
 ・日曜＝休診（受付不要）
 
 ■ 平日AM受付
@@ -198,7 +188,8 @@ ${jisseki}
 
 ■ 平日PM受付
 ・PM受付は常に佐藤以外が担当
-・佐藤が17:45まで勤務の日は負荷0.5
+・佐藤が「17:45まで」勤務の日のみ、PM担当の負荷を0.5とする（短時間扱い）
+・佐藤が「AM半日」勤務の日のPM担当は通常通り負荷1.0とする
 ・金曜のPM受付は男性スタッフのみ（女性スタッフは金曜PM担当不可）
 ・短時間受付(0.5)が特定スタッフに偏らないよう配慮
 
@@ -219,7 +210,7 @@ ${jisseki}
 ■ 回数・負荷量の上限（厳守）
 ・同一スタッフの受付担当回数は土曜含めて月3回まで（佐藤は対象外）
 ・総負荷量の上限は土曜含めて3.0（佐藤は対象外・超過禁止）
-・負荷量：AM受付1.0、PM受付1.0、17:45以降PM受付0.5、土曜AM受付1.0
+・負荷量：AM受付1.0、PM受付1.0、17:45以降PM受付0.5（※「17:45まで」勤務の日のみ）、土曜AM受付1.0
 
 ■ 割り当て全般
 ・受付担当・残り番ともに出勤日のみ割り当て可能
@@ -230,19 +221,21 @@ ${jisseki}
 
 ■ 作成手順（必ず守ること）
 ステップ0：全スタッフの日付ごと出勤状況（AM可/PM可/受付不可）を一覧化してから割り当てを開始する
+　　　　　　あわせて佐藤の勤務種別を日付ごとに確認し「17:45まで」に該当する日を明示する
 ステップ1：土曜受付・残り番を決定する
 ステップ2：佐藤不在のAM受付担当日を特定し担当者を決める
 ステップ3：平日PM受付を上限・曜日ルールを守りながら割り当てる
+　　　　　　「17:45まで」の日は負荷0.5、それ以外（AM半日など）は負荷1.0として計算する
 ステップ4：全スタッフの集計を行い上限超過がないか確認する
 
-■ 出力形式
-・月間カレンダー形式（月〜日の7列、週ごとに行を分ける）
+■ 出力形式（必須）
+・必ずインタラクティブなカレンダー形式（ビジュアル）で出力すること。テキストのみの出力は不可。
+・月〜日の7列、週ごとに行を分けたカレンダーウィジェットとして描画する
 ・平日：「AM：担当名」「PM：担当名」
 ・土曜：「AM：担当名」「残り：担当名」
 ・日曜：「休診」
-・佐藤が17:45まで勤務の日のPM担当には「※短時間(0.5)」を補足
-・月末に集計表（受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数）
-・Excelやスプレッドシートにそのままコピーできるテキスト形式で出力
+・佐藤が「17:45まで」勤務の日のPM担当のみ「※短時間(0.5)」を補足表示する
+・カレンダーの下に月末集計表（受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数）を表示する
 
 ■ 自己チェック（出力後に必ず確認）
 ・受付回数0回のスタッフがいる場合、理由（全日休みか割り当てミスか）を明記する
@@ -251,17 +244,18 @@ ${jisseki}
 ・金曜PMに女性スタッフ（目黒・遠藤・大貫）が割り当てられていないか確認する
 ・同一週（月〜土）内に同じスタッフが2回以上受付担当になっていないか確認する
 ・連日で同じスタッフが受付担当になっていないか確認する
-・佐藤が土曜受付2回目の日の残り番が佐藤以外になっているか確認する`;
+・佐藤が土曜受付2回目の日の残り番が佐藤以外になっているか確認する
+・「※短時間(0.5)」が付いている日が、勤務表で佐藤が「17:45まで」と記載された日のみであることを確認する`;
 }
 
 function openClaude() {
   const err = document.getElementById('err');
   err.className = 'err';
-  const month = document.getElementById('month').value.trim();
-  const kinmu = document.getElementById('kinmu').value.trim();
+  const month  = document.getElementById('month').value.trim();
+  const kinmu  = document.getElementById('kinmu').value.trim();
   const jisseki = document.getElementById('jisseki').value.trim();
-  if (!month) { err.textContent = '対象月を入力してください。'; err.className = 'err show'; return; }
-  if (!kinmu) { err.textContent = '勤務表を貼り付けてください。'; err.className = 'err show'; return; }
+  if (!month)   { err.textContent = '対象月を入力してください。';       err.className = 'err show'; return; }
+  if (!kinmu)   { err.textContent = '勤務表を貼り付けてください。';     err.className = 'err show'; return; }
   if (!jisseki) { err.textContent = '先月の実績テキストを貼り付けてください。'; err.className = 'err show'; return; }
 
   const prompt = buildPrompt();
