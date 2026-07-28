@@ -2,754 +2,275 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>受付担当表作成プロンプト</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>受付担当表 作成ツール</title>
 <style>
-  :root {
-    --accent: #2a5d8f;
-    --accent-light: #eaf2fa;
-    --must: #c0392b;
-    --havetoc: #b8860b;
-    --border: #cfd8e3;
-    --bg: #f7f9fb;
-  }
-  * { box-sizing: border-box; }
-  body {
-    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-    background: var(--bg);
-    color: #222;
-    line-height: 1.75;
-    margin: 0;
-    padding: 0 0 60px 0;
-  }
-  header.page-title {
-    background: linear-gradient(135deg, var(--accent), #16324f);
-    color: #fff;
-    padding: 32px 24px;
-    text-align: center;
-  }
-  header.page-title h1 {
-    margin: 0 0 6px 0;
-    font-size: 1.6em;
-    letter-spacing: 0.05em;
-  }
-  header.page-title p {
-    margin: 0;
-    opacity: 0.85;
-    font-size: 0.95em;
-  }
-  .container {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  nav.toc {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin: 24px 0;
-    padding: 18px 22px;
-  }
-  nav.toc h2 {
-    margin-top: 0;
-    font-size: 1.05em;
-    color: var(--accent);
-  }
-  nav.toc ol {
-    columns: 2;
-    -webkit-columns: 2;
-    padding-left: 1.2em;
-    font-size: 0.92em;
-  }
-  nav.toc a { color: #333; text-decoration: none; }
-  nav.toc a:hover { text-decoration: underline; color: var(--accent); }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;}
 
-  section.block {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-left: 6px solid var(--accent);
-    border-radius: 10px;
-    margin: 22px 0;
-    padding: 22px 26px;
-  }
-  section.block h2 {
-    margin-top: 0;
-    color: var(--accent);
-    font-size: 1.15em;
-    border-bottom: 2px solid var(--accent-light);
-    padding-bottom: 8px;
-  }
-  section.block h3 {
-    color: #16324f;
-    font-size: 1.0em;
-    margin-bottom: 6px;
-  }
-  section.step {
-    border-left-color: #3d7a3d;
-  }
-  section.step h2 { color: #3d7a3d; }
-  section.output, section.selfcheck {
-    border-left-color: #8f4c9c;
-  }
-  section.output h2, section.selfcheck h2 { color: #8f4c9c; }
+.header{background:#fff;border-bottom:1px solid #e5e5e5;padding:16px 24px;display:flex;align-items:center;gap:12px;}
+.header h1{font-size:17px;font-weight:600;}
+.badge{font-size:11px;background:#e8f4e8;color:#2e7d32;padding:2px 10px;border-radius:20px;font-weight:500;}
 
-  .rule-abs {
-    background: #fdecea;
-    border: 1px solid #f1b0a8;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin: 10px 0;
-  }
-  .rule-abs strong { color: var(--must); }
+.container{max-width:820px;margin:0 auto;padding:24px 16px 60px;}
 
-  .rule-principle {
-    background: #fff8e6;
-    border: 1px solid #f0d68a;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin: 10px 0;
-  }
-  .rule-principle strong { color: var(--havetoc); }
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px 24px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:600;color:#555;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.num{width:22px;height:22px;background:#2e7d32;color:#fff;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;}
+.hint{font-size:12px;color:#888;margin-bottom:12px;line-height:1.7;}
 
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 12px 0;
-    font-size: 0.93em;
-  }
-  table th, table td {
-    border: 1px solid var(--border);
-    padding: 8px 10px;
-    text-align: left;
-    vertical-align: top;
-  }
-  table th {
-    background: var(--accent-light);
-    color: #16324f;
-  }
-  table.staff-list td:first-child { font-weight: bold; white-space: nowrap; }
+.ext-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.btn-ext{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity 0.15s;white-space:nowrap;}
+.btn-ext:hover{opacity:0.82;}
+.btn-ext svg{width:15px;height:15px;flex-shrink:0;}
+.btn-gem{background:#1a73e8;color:#fff;}
+.btn-drive{background:#34a853;color:#fff;}
+.ext-hint{font-size:11px;color:#888;}
 
-  ul, ol { padding-left: 1.4em; }
-  li { margin-bottom: 4px; }
+input[type=text]{font-size:13px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#1a1a1a;outline:none;width:220px;}
+input[type=text]:focus{border-color:#2e7d32;background:#fff;}
+textarea{width:100%;font-size:12px;font-family:'Courier New',monospace;padding:10px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#1a1a1a;resize:vertical;min-height:160px;line-height:1.7;outline:none;}
+textarea:focus{border-color:#2e7d32;background:#fff;}
 
-  .tag {
-    display: inline-block;
-    font-size: 0.75em;
-    font-weight: bold;
-    padding: 2px 8px;
-    border-radius: 12px;
-    margin-right: 6px;
-    color: #fff;
-  }
-  .tag.must { background: var(--must); }
-  .tag.principle { background: var(--havetoc); }
-  .tag.step { background: #3d7a3d; }
+.btn-main{width:100%;padding:15px;font-size:15px;font-weight:600;border:none;border-radius:10px;background:#2e7d32;color:#fff;cursor:pointer;transition:background 0.15s,transform 0.1s;margin-top:4px;}
+.btn-main:hover{background:#256427;}
+.btn-main:active{transform:scale(0.99);}
+.btn-main.done{background:#1a56db;}
 
-  .note-example {
-    background: #f0f4f8;
-    border: 1px dashed #9fb3c8;
-    border-radius: 6px;
-    padding: 10px 14px;
-    font-size: 0.9em;
-    color: #444;
-  }
+.step-box{background:#e8f4e8;border:1px solid #c8e6c9;border-radius:10px;padding:16px 20px;margin-top:16px;display:none;}
+.step-box h3{font-size:13px;font-weight:600;color:#2e7d32;margin-bottom:10px;}
+.step-box ol{padding-left:18px;font-size:13px;color:#333;line-height:2.4;}
 
-  .checklist label {
-    display: block;
-    padding: 4px 0;
-    border-bottom: 1px dotted #ddd;
-  }
-  .checklist input[type="checkbox"] {
-    margin-right: 8px;
-  }
+.err{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;color:#c0392b;font-size:12px;margin-top:10px;display:none;}
+.err.show{display:block;}
 
-  code, .mono {
-    font-family: "SFMono-Regular", Consolas, monospace;
-    background: #eef1f4;
-    padding: 1px 5px;
-    border-radius: 4px;
-    font-size: 0.9em;
-  }
-
-  .placeholder-box {
-    background: #fbfbfb;
-    border: 1px dashed #bbb;
-    padding: 14px 18px;
-    border-radius: 6px;
-    color: #666;
-    font-style: italic;
-  }
-
-  footer {
-    text-align: center;
-    color: #888;
-    font-size: 0.85em;
-    margin-top: 40px;
-  }
-
-  @media print {
-    section.block { break-inside: avoid; }
-    nav.toc { display: none; }
-  }
-
-  @media (max-width: 700px) {
-    nav.toc ol { columns: 1; }
-  }
+/* 変更点ハイライト用（開発確認用・本番では外してOK） */
 </style>
 </head>
 <body>
 
-<header class="page-title">
-  <h1>📅 受付担当表 自動作成プロンプト</h1>
-  <p>勤務表から月間の受付担当・残り番を自動割り当てするための運用ルール一式</p>
-</header>
+<div class="header">
+  <h1>受付担当表 作成ツール</h1>
+  <span class="badge">APIキー不要</span>
+</div>
 
 <div class="container">
 
-  <nav class="toc">
-    <h2>目次</h2>
+  <!-- ① 対象月 -->
+  <div class="card">
+    <div class="card-title"><span class="num">1</span>対象月</div>
+    <input type="text" id="month" placeholder="例：2026年7月" />
+  </div>
+
+  <!-- ② 勤務表 -->
+  <div class="card">
+    <div class="card-title"><span class="num">2</span>勤務表</div>
+    <div class="ext-row">
+      <a class="btn-ext btn-gem"
+         href="https://gemini.google.com/gem/1gfP2szCGStxbQgmN8ZSn8AS116F0XAOY"
+         target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
+        </svg>
+        Gemで勤務表を変換する
+      </a>
+      <span class="ext-hint">↑ 画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
+    </div>
+    <p class="hint">Gemで変換したテキストをそのまま貼り付けてください。</p>
+    <textarea id="kinmu" placeholder="荒井
+6/1 ○
+6/2 ○
+6/3 ○
+...
+佐藤
+6/1 AM半日
+6/2 17:45まで
+..."></textarea>
+  </div>
+
+  <!-- ③ 実績入力 -->
+  <div class="card">
+    <div class="card-title"><span class="num">3</span>先月の実績 ＆ 土曜年間累計</div>
+    <div class="ext-row">
+      <a class="btn-ext btn-gem"
+         href="https://gemini.google.com/gem/cc4662ec277d"
+         target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
+        </svg>
+        Gemで実績を変換する
+      </a>
+      <span class="ext-hint">↑ 集計表の画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
+    </div>
+    <p class="hint">Gemが出力したテキストをそのまま貼り付けてください。</p>
+    <textarea id="jisseki" placeholder="■ 荒井
+* 先月受付回数: 3
+* 先月負荷量: 2.5
+■ 関根
+* 先月受付回数: 2
+* 先月負荷量: 2
+* 年間土曜受付回数: 1
+* 年間残り番回数: 1
+..."></textarea>
+  </div>
+
+  <!-- ④ 特記事項 -->
+  <div class="card">
+    <div class="card-title"><span class="num">4</span>今月の特記事項・調整依頼（任意）</div>
+    <p class="hint">固定ルールより優先して反映されます。記載がない場合は空欄のままで構いません。</p>
+    <textarea id="biko" style="min-height:100px;" placeholder="例：
+・宮田・久保は外勤があるため今月の受付担当は1回までに抑える
+・新井を優先的に土曜担当にしてほしい
+・森田は体調不良のため今月は負担を軽くする"></textarea>
+  </div>
+
+  <!-- 生成ボタン -->
+  <button class="btn-main" id="btn" onclick="openClaude()">
+    Claude でそのまま担当表を作成する →
+  </button>
+  <div class="err" id="err"></div>
+
+  <!-- 開いた後の案内 -->
+  <div class="step-box" id="step-box">
+    <h3>✅ Claude.ai が開きました！</h3>
     <ol>
-      <li><a href="#sec-yearmonth">年月・曜日の指定</a></li>
-      <li><a href="#sec-1245">AM(12:45)/12:45の扱い</a></li>
-      <li><a href="#sec-week">週の定義と同週1回制限</a></li>
-      <li><a href="#sec-sat-limit">土曜受付の上限</a></li>
-      <li><a href="#sec-sato">佐藤の勤務種別の扱い</a></li>
-      <li><a href="#sec-fixedoff">スタッフ別固定休（優先順位）</a></li>
-      <li><a href="#sec-notes">今月の特記事項・調整依頼</a></li>
-      <li><a href="#sec-shift">勤務表フォーマット</a></li>
-      <li><a href="#sec-lastmonth">先月実績・土曜年間累計</a></li>
-      <li><a href="#sec-prevweek">前月末1週間の受付担当一覧</a></li>
-      <li><a href="#sec-fixedrules">固定ルール（全般）</a></li>
-      <li><a href="#sec-step0">ステップ0：一覧書き出し</a></li>
-      <li><a href="#sec-step1">ステップ1：土曜受付・残り番</a></li>
-      <li><a href="#sec-step2">ステップ2：佐藤不在AM担当</a></li>
-      <li><a href="#sec-step3">ステップ3：平日PM受付</a></li>
-      <li><a href="#sec-step4">ステップ4：集計・確認</a></li>
-      <li><a href="#sec-output">出力形式</a></li>
-      <li><a href="#sec-selfcheck">自己チェック</a></li>
+      <li>プロンプトがチャット欄に入力済みです</li>
+      <li>送信ボタン（↑）を押すだけで担当表が作成されます</li>
+      <li>生成された担当表をそのまま確認・共有できます</li>
     </ol>
-  </nav>
-
-  <!-- 年月・曜日 -->
-  <section class="block" id="sec-yearmonth">
-    <h2>🗓️ 年月・曜日の指定<span class="tag must">絶対厳守</span></h2>
-    <ul>
-      <li>必ず「●●年●月」として処理・描画すること</li>
-      <li>カレンダーは月初1日から月末最終日で終わること</li>
-      <li>1日の曜日・土日の日付は毎月必ず確認して正確に記載すること</li>
-      <li>土曜・日曜（休診）の日付を月初に必ずリストアップしてから作業を開始すること</li>
-    </ul>
-  </section>
-
-  <!-- AM(12:45) -->
-  <section class="block" id="sec-1245">
-    <h2>⏰ AM(12:45)または12:45の扱い<span class="tag must">絶対厳守</span></h2>
-    <ul>
-      <li>AM(12:45)または12:45は<strong>【土曜日のみ】</strong>受付可能</li>
-      <li>平日にAM(12:45)または12:45と記載されている日は、AMもPMも受付担当への割り当て禁止</li>
-      <li>荒井の平日AM(12:45)または12:45該当日は毎月勤務表から確認し「受付不可」に分類する</li>
-      <li>ステップ0-Aでこれらを「受付不可」に分類してから次のステップに進むこと</li>
-    </ul>
-  </section>
-
-  <!-- 週の定義 -->
-  <section class="block" id="sec-week">
-    <h2>📆 週の定義と同週1回制限<span class="tag must">絶対厳守</span></h2>
-    <ul>
-      <li>「週」は必ず<strong>月曜〜土曜</strong>として定義する（日曜は休診のため対象外）</li>
-      <li>月初・月末で月曜〜土曜が揃わない週は存在する日付のみを対象とする
-        <div class="note-example">例：月初が水曜の場合、第1週は「水〜土」のみ</div>
-      </li>
-      <li>1人のスタッフに割り当てるたびに週カウントを+1し、すでに1回あれば割り当て禁止（佐藤除く）</li>
-      <li>週カウント確認をスキップして割り当てることを禁止する</li>
-    </ul>
-  </section>
-
-  <!-- 土曜受付の上限 -->
-  <section class="block" id="sec-sat-limit">
-    <h2>🈵 土曜受付の上限<span class="tag must">絶対厳守</span></h2>
-    <ul>
-      <li>佐藤が出勤している土曜は原則佐藤が受付を担当する</li>
-      <li>佐藤が休みの土曜のみ他スタッフが受付を担当する</li>
-      <li>佐藤以外の各スタッフが土曜受付を担当できるのは<strong>月1回まで</strong></li>
-      <li>ステップ1完了後、必ず全土曜の担当一覧を書き出し、同一スタッフが2回以上になっていないか確認してから次のステップへ進む</li>
-      <li>土曜受付も「同週1回制限」のカウント対象に含める</li>
-    </ul>
-  </section>
-
-  <!-- 佐藤の勤務種別 -->
-  <section class="block" id="sec-sato">
-    <h2>👤 佐藤の勤務種別の扱い<span class="tag must">絶対厳守・混同禁止</span></h2>
-    <table>
-      <thead>
-        <tr><th>勤務種別</th><th>AM受付</th><th>PM受付</th><th>PM負荷</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>AM半日またはAM</td><td>佐藤が担当</td><td>不可→他者担当</td><td>1.0</td></tr>
-        <tr><td>17:45までまたは17:45</td><td>佐藤が担当</td><td>不可→他者担当</td><td>0.5</td></tr>
-        <tr>
-          <td>AM(12:45)または12:45</td>
-          <td>【平日】不可<br>【土曜】佐藤が受付担当</td>
-          <td>不可</td>
-          <td>—</td>
-        </tr>
-        <tr><td>休</td><td>不可</td><td>不可</td><td>—</td></tr>
-      </tbody>
-    </table>
-    <div class="rule-abs">
-      <strong>★</strong> 「AM半日またはAM」も「17:45までまたは17:45」も、PMは必ず佐藤以外のスタッフが担当する。どちらの場合もPM担当を空欄にすることは禁止。
-    </div>
-    <div class="rule-abs">
-      <strong>★</strong> 「AM半日またはAM」と「17:45までまたは17:45」の唯一の違いはPM負荷のみ。
-      <ul>
-        <li>AM半日またはAM → PM担当の負荷 1.0</li>
-        <li>17:45までまたは17:45 → PM担当の負荷 0.5</li>
-      </ul>
-      この2種別を混同することを禁止する。
-    </div>
-    <div class="rule-abs">
-      <strong>★</strong> 佐藤の土曜AM(12:45)または12:45は「出勤」扱いとする。
-      <ul>
-        <li>→佐藤が土曜にAM(12:45)または12:45の場合は佐藤が受付を担当する。</li>
-        <li>→残り番は別途他スタッフ1名を割り当てる。</li>
-        <li>→「佐藤が休みの土曜のみ他スタッフが受付を担当する」ルールは、佐藤が土曜にAM(12:45)または12:45出勤の場合には適用しない。</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 固定休 -->
-  <section class="block" id="sec-fixedoff">
-    <h2>🚫 スタッフ別固定休（優先順位ルール）</h2>
-    <h3>各スタッフの通常の固定休曜日</h3>
-    <table class="staff-list">
-      <tr><td>荒井</td><td>金曜・土曜</td></tr>
-      <tr><td>関根</td><td>月曜</td></tr>
-      <tr><td>大貫</td><td>火曜</td></tr>
-      <tr><td>遠藤</td><td>火曜</td></tr>
-      <tr><td>新井</td><td>水曜</td></tr>
-      <tr><td>久保</td><td>水曜</td></tr>
-      <tr><td>内田</td><td>木曜</td></tr>
-      <tr><td>目黒</td><td>木曜</td></tr>
-      <tr><td>宮田</td><td>木曜</td></tr>
-      <tr><td>森田</td><td>金曜</td></tr>
-    </table>
-
-    <h3>★ 適用ルール</h3>
-    <div class="rule-abs">
-      <strong>【絶対厳守】</strong>
-      <ul>
-        <li>勤務表で「休」と記載されている日は、固定休曜日かどうかにかかわらず受付割り当て不可（これは固定休ルールではなく勤務表の基本ルール）</li>
-        <li>「固定休ルール」の対象は勤務表で「○（出勤）」と記載されている日のみに適用する</li>
-      </ul>
-    </div>
-    <div class="rule-principle">
-      <strong>【原則厳守】</strong>
-      <ul>
-        <li>勤務表で「○」と記載されていても、固定休曜日に該当するスタッフは候補の優先順位を下げる</li>
-        <li>同条件（月間回数・負荷・先月実績等が同程度）の他候補がいる場合は、固定休曜日該当スタッフよりそちらを優先して割り当てる</li>
-        <li>固定休曜日該当スタッフしか残っていない場合は割り当て可能とする。その際「固定休曜日だが他候補なし」と注記する</li>
-      </ul>
-    </div>
-
-    <h3>★ 候補リスト作成時の表記ルール</h3>
-    <ul>
-      <li>固定休曜日に該当しないスタッフ→「◎」と表記する</li>
-      <li>固定休曜日に該当するスタッフ（勤務表は「○」）→「△（固定休曜日・優先度低）」と注記する</li>
-      <li>「△」のスタッフは「◎」のスタッフが1人でも残っていれば割り当てない</li>
-      <li>「△」のみになった場合に初めて割り当て対象とし「固定休曜日だが他候補なし」と明記する</li>
-    </ul>
-  </section>
-
-  <!-- 特記事項 -->
-  <section class="block" id="sec-notes">
-    <h2>📝 今月の特記事項・調整依頼<span class="tag principle">固定ルールより優先して反映</span></h2>
-    <p>※毎月ここに当月の特記事項を記載する</p>
-    <div class="placeholder-box">
-      例）<br>
-      【MUST】●月●日(●)●● 残り番・受付ともになし<br>
-      【HAVE TO】●●・●●水曜日のAM受付なし
-    </div>
-  </section>
-
-  <!-- 勤務表フォーマット -->
-  <section class="block" id="sec-shift">
-    <h2>🗂️ 勤務表フォーマット</h2>
-    <p>※毎月以下のフォーマットで各スタッフの勤務を記載する</p>
-    <div class="placeholder-box">
-      スタッフ名<br>
-      ●/●(●)勤務種別 /●/●(●)勤務種別 /…（月末まで続ける）
-    </div>
-    <h3>勤務種別の記載ルール</h3>
-    <table>
-      <thead><tr><th>種別</th><th>表記</th></tr></thead>
-      <tbody>
-        <tr><td>通常出勤</td><td>○</td></tr>
-        <tr><td>休み全日</td><td>休</td></tr>
-        <tr><td>有給休暇全日</td><td>有休</td></tr>
-        <tr><td>午前休</td><td>AM有休</td></tr>
-        <tr><td>午後休</td><td>PM有休</td></tr>
-        <tr><td>午前のみ勤務</td><td>AM半日またはAM</td></tr>
-        <tr><td>午後のみ勤務</td><td>PM半日</td></tr>
-        <tr><td>土曜短時間</td><td>AM(12:45)または12:45</td></tr>
-        <tr><td>佐藤特殊勤務</td><td>17:45までまたは17:45</td></tr>
-        <tr><td>日曜</td><td>休（休診）</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <!-- 先月実績 -->
-  <section class="block" id="sec-lastmonth">
-    <h2>📊 先月の平日受付実績・土曜年間累計</h2>
-    <p>※毎月以下の形式で更新して記載する</p>
-    <div class="placeholder-box">
-      スタッフ名：先月受付●回・負荷●●・年間土曜●・残り番●<br>
-      （佐藤は対象外のため記載不要）
-    </div>
-  </section>
-
-  <!-- 前週一覧 -->
-  <section class="block" id="sec-prevweek">
-    <h2>📋 前月末から1週間受付担当一覧</h2>
-    <p>※毎月、前月最終週（月〜土）の受付担当を記載する。前週同曜日不可リストの作成に使用する</p>
-    <div class="placeholder-box">
-      ●/●(●) AM:●● PM:●●<br>
-      （以下同形式で7日分）
-    </div>
-  </section>
-
-  <!-- 固定ルール -->
-  <section class="block" id="sec-fixedrules">
-    <h2>⚙️ 固定ルール</h2>
-
-    <h3>■ スタッフ情報</h3>
-    <ul>
-      <li>受付担当対象スタッフ：荒井・関根・目黒・久保・新井・内田・森田・大貫・宮田・遠藤・佐藤</li>
-      <li>中村は平日・土曜を問わず受付担当・残り番ともに割り当てない（妊娠中のため配慮）</li>
-      <li>佐藤は受付業務担当者のため回数均等化・月3回上限・総負荷量上限の対象外</li>
-      <li>男性スタッフ：荒井・新井・関根・内田・宮田・久保・森田</li>
-      <li>女性スタッフ：目黒・佐藤・遠藤・大貫</li>
-    </ul>
-
-    <h3>■ 勤務表の読み方</h3>
-    <table>
-      <tbody>
-        <tr><td>○</td><td>出勤（AM・PM両方受付可）</td></tr>
-        <tr><td>休・有休等</td><td>休み（受付不可）</td></tr>
-        <tr><td>AM有休</td><td>午前休み（PM受付のみ可）</td></tr>
-        <tr><td>PM有休</td><td>午後休み（AM受付のみ可）</td></tr>
-        <tr><td>AM半日またはAM</td><td>佐藤のみの勤務区分。佐藤がAMを担当し、PMは必ず他者が担当する。PM担当の負荷は1.0。</td></tr>
-        <tr><td>PM半日</td><td>午後のみ勤務（AM受付不可・PM受付可）</td></tr>
-        <tr><td>AM(12:45)または12:45</td><td>平日は午前・午後ともに受付不可。土曜日のみAM受付可。★佐藤が土曜にAM(12:45)または12:45の場合は佐藤が受付担当。★佐藤以外のスタッフが土曜にAM(12:45)または12:45の場合も受付担当可能。</td></tr>
-        <tr><td>17:45までまたは17:45</td><td>佐藤のみの特殊勤務区分。佐藤がAMを担当し、PMは必ず他者が担当する。PM担当の負荷は0.5。「AM半日またはAM」との違いはPM負荷のみ。混同禁止。</td></tr>
-        <tr><td>日曜</td><td>休診（受付不要）</td></tr>
-      </tbody>
-    </table>
-    <div class="rule-abs">
-      <strong>★</strong> 平日（月〜金）はAM・PMともに必ず受付担当を置くこと。PM担当が空欄になる平日が発生した場合はエラーとして修正する。ただし以下の日はPMなしが正当：
-      <ul>
-        <li>佐藤が「休」または「AM(12:45)または12:45」かつ出勤可能な他スタッフが誰もいない場合のみ（その場合は理由を明記する）</li>
-      </ul>
-    </div>
-
-    <h3>■ 平日AM受付</h3>
-    <ul>
-      <li>佐藤が出勤している日（AM半日またはAM・17:45までまたは17:45）は佐藤がAM担当</li>
-      <li>佐藤が休みまたはAM(12:45)または12:45の日は他スタッフがAM担当（月1回まで・均等に）</li>
-    </ul>
-
-    <h3>■ 平日PM受付</h3>
-    <ul>
-      <li>PM受付は常に佐藤以外が担当</li>
-      <li>佐藤の勤務種別にかかわらず、平日は毎日PM担当を置く</li>
-      <li>佐藤が「17:45までまたは17:45」勤務の日のみ、PM担当の負荷を0.5とする</li>
-      <li>佐藤が「AM半日またはAM」勤務の日のPM担当の負荷は1.0</li>
-      <li>佐藤が「休」の日のPM担当の負荷は1.0</li>
-      <li>金曜のPM受付は男性スタッフのみ（女性スタッフは金曜PM担当不可）</li>
-      <li>短時間受付（0.5）が特定スタッフに偏らないよう配慮</li>
-    </ul>
-    <div class="rule-abs"><strong>★</strong> PM担当が空欄になる平日はエラー。必ず全平日にPM担当者を記載すること。</div>
-
-    <h3>■ 土曜受付</h3>
-    <ul>
-      <li>土曜はAM受付のみ（PM受付なし）</li>
-      <li>土曜のAM(12:45)または12:45勤務は受付担当可能</li>
-      <li>佐藤が出勤している土曜（○またはAM(12:45)または12:45）は原則佐藤が受付を担当する</li>
-      <li>佐藤が休みの土曜のみ、他スタッフが受付を担当する（月1回まで・絶対厳守）</li>
-      <li>前週土曜が休みだったスタッフは翌週土曜の受付担当を避ける</li>
-    </ul>
-
-    <h3>■ 土曜残り番</h3>
-    <ul>
-      <li>1日につき1人を割り当て</li>
-      <li>荒井は土曜が固定休のため対象外</li>
-      <li>残り番は原則月1回まで</li>
-      <li>佐藤が受付を担当する土曜が複数ある場合、そのうち1回は佐藤が受付＋残り番を兼任し、残りの土曜は佐藤以外のスタッフが残り番を担当する</li>
-      <li>佐藤以外のスタッフが受付を担当した土曜は、そのスタッフが残り番も兼任する</li>
-      <li>同じスタッフが同月内に残り番を2回担当しない</li>
-    </ul>
-
-    <h3>■ 回数・負荷量の上限<span class="tag must">絶対厳守</span></h3>
-    <ul>
-      <li>同一スタッフの受付担当回数は土曜含めて月3回まで（佐藤は対象外）</li>
-      <li>総負荷量の上限は土曜含めて3.0（佐藤は対象外・超過禁止）</li>
-      <li>負荷量：AM受付1.0、PM受付1.0、17:45以降PM受付0.5（「17:45までまたは17:45」勤務日のみ）、土曜AM受付1.0</li>
-    </ul>
-
-    <h3>■ 割り当て全般</h3>
-    <ul>
-      <li>受付担当・残り番ともに出勤日のみ割り当て可能</li>
-      <li>同一スタッフの受付担当は同一週（月〜土）内に1回まで（佐藤は対象外）</li>
-      <li>前週と同じ曜日の担当にならないようにする（佐藤は対象外）</li>
-      <li>連日（前日または翌日）に同じスタッフを受付担当にしない</li>
-      <li>同一スタッフが同日にAM受付とPM受付を両方担当しない</li>
-    </ul>
-
-    <h3>■ 制約の優先順位</h3>
-    <div class="rule-abs">
-      <strong>【絶対厳守】</strong>
-      <ul>
-        <li>月3回・負荷3.0の上限超過禁止</li>
-        <li>金曜PM女性スタッフ割り当て禁止</li>
-        <li>同日AM・PM両方を同一スタッフに割り当て禁止</li>
-        <li>中村への割り当て禁止</li>
-        <li>残り番の同月2回禁止</li>
-        <li>土曜「前週休みスタッフは翌週受付不可」</li>
-        <li>AM(12:45)または12:45の平日は受付不可</li>
-        <li>佐藤以外の土曜受付は月1回まで</li>
-        <li>佐藤が出勤している土曜（○またはAM(12:45)または12:45）は佐藤が受付担当（原則）</li>
-        <li>平日は毎日PM担当を置くこと（PM空欄はエラー）</li>
-        <li>「休」のスタッフへの割り当て禁止（固定休曜日かどうかにかかわらず）</li>
-      </ul>
-    </div>
-    <div class="rule-principle">
-      <strong>【原則厳守（詰まった場合のみ緩める・理由明記）】</strong>
-      <ul>
-        <li>固定休曜日（○出勤日）への割り当て回避 → 緩める条件：◎グループ候補が0人になった場合のみ → 緩める場合は「固定休曜日だが他候補なし」と明記</li>
-        <li>前週同曜日回避 → 緩める条件1：出勤可能者が他にいない場合のみ／緩める条件2：金曜PM担当可能な男性スタッフが前週同曜日回避で全員不可になった場合</li>
-        <li>連日回避と同週1回制限は両方必ず満たすこと</li>
-      </ul>
-    </div>
-
-    <h3>■ 特記事項の強度解釈</h3>
-    <ul>
-      <li><span class="tag must">MUST</span>と記載された特記事項 → 絶対厳守</li>
-      <li><span class="tag principle">HAVE TO</span>と記載された特記事項 → 最大限努力（他の絶対厳守ルールと競合する場合は他を優先）</li>
-    </ul>
-  </section>
-
-  <!-- ステップ0 -->
-  <section class="block step" id="sec-step0">
-    <h2><span class="tag step">STEP 0</span> 各種一覧の書き出し（段階的出力モード）</h2>
-    <div class="rule-abs">
-      ⚠️各ステップは必ずテキストとして出力・書き出してから次のステップに進むこと。省略・内部処理のみで済ませることを禁止する。各ステップ完了後に「✅ステップX完了」と明記すること。
-    </div>
-
-    <h3>【0-A】全スタッフ × 全日付の出勤可否マトリクス</h3>
-    <ul>
-      <li>各スタッフについて全日付を「AM可／PM可／受付不可」に分類した表を出力する</li>
-      <li>「AM(12:45)または12:45は平日受付不可」「休・有休等は受付不可」を必ず適用してから分類する</li>
-      <li>佐藤は出勤種別（AM半日またはAM／17:45までまたは17:45／AM(12:45)または12:45／休）を日付ごとに明記する</li>
-      <li>佐藤の土曜AM(12:45)または12:45は「出勤・受付可」と明記する</li>
-      <li>荒井の平日AM(12:45)または12:45日は「受付不可」と明記する</li>
-      <li>固定休曜日に該当する日は「△（固定休曜日・優先度低）」と注記する。ただし勤務表が「休」の場合は「受付不可」のまま</li>
-    </ul>
-
-    <h3>【0-B】佐藤の「17:45までまたは17:45」該当日リスト</h3>
-    <ul>
-      <li>勤務表に「17:45までまたは17:45」と明記された日だけをリストアップする</li>
-      <li>「AM半日またはAM」「AM(12:45)または12:45」など他の種別は含めない</li>
-    </ul>
-
-    <h3>【0-B2】平日PM担当が必要な全日リスト</h3>
-    <ul>
-      <li>平日（月〜金）の全日付をリストアップする</li>
-      <li>各日の佐藤の勤務種別と、PM負荷（1.0 or 0.5）を明記する</li>
-      <li>以下のいずれかに該当する日のみ「PMなし」と分類する：佐藤が「休」または「AM(12:45)または12:45」かつ出勤可能な他スタッフが0人の場合</li>
-      <li>それ以外の全平日は「PM担当必要」と分類する</li>
-    </ul>
-
-    <h3>【0-C】前週同曜日不可リスト（今月第1週分）</h3>
-    <ul>
-      <li>前月末から1週間受付担当一覧をもとに、今月第1週の各曜日について「前週PM担当者＝今週同曜日PM不可」の対応表を出力する</li>
-    </ul>
-
-    <h3>【0-D】固定休曜日早見表（当月分）</h3>
-    <ul>
-      <li>当月の全平日について、各スタッフの固定休曜日該当日を日付単位で一覧化する
-        <div class="note-example">例）●/●(水)：新井・久保が固定休曜日（水曜）→△</div>
-      </li>
-      <li>勤務表で「休」の場合は「受付不可」と記載し固定休曜日注記は不要</li>
-      <li>この一覧をステップ2・3の候補除外時に必ず参照すること</li>
-    </ul>
-
-    <p><strong>✅ステップ0完了と明記してからステップ1へ進む</strong></p>
-  </section>
-
-  <!-- ステップ1 -->
-  <section class="block step" id="sec-step1">
-    <h2><span class="tag step">STEP 1</span> 土曜受付・残り番を決定する</h2>
-    <ul>
-      <li>当月の土曜日を全て列挙し、佐藤の出勤・休みを確認する</li>
-      <li>佐藤の土曜勤務種別を以下の通り判定する：
-        <ul>
-          <li>「○」または「AM(12:45)または12:45」= 出勤 = 佐藤が受付担当</li>
-          <li>「休」= 他スタッフが受付担当（月1回まで・絶対厳守）</li>
-        </ul>
-      </li>
-      <li>前週土曜が休みだったスタッフは受付担当不可</li>
-      <li>特記事項（MUST）がある場合は最優先で反映する</li>
-      <li>残り番ルールを適用して残り番担当も決定する
-        <ul>
-          <li>佐藤が受付を担当する土曜が複数ある場合、1回は佐藤が受付＋残り番を兼任し、残りの土曜は佐藤以外のスタッフが残り番を担当する</li>
-          <li>佐藤以外が受付を担当した土曜は、そのスタッフが残り番も兼任する</li>
-          <li>同一スタッフの残り番が同月2回にならないよう確認する</li>
-        </ul>
-      </li>
-      <li>担当決定後、必ず全土曜の担当一覧を書き出し「同一スタッフが2回以上いないか」を確認してから次のステップへ</li>
-    </ul>
-    <p><strong>✅ステップ1完了と明記してからステップ2へ進む</strong></p>
-  </section>
-
-  <!-- ステップ2 -->
-  <section class="block step" id="sec-step2">
-    <h2><span class="tag step">STEP 2</span> 佐藤不在のAM受付担当日を特定し担当者を決める</h2>
-    <ul>
-      <li>佐藤が「休」または「平日AM(12:45)または12:45」の平日を特定する</li>
-      <li>その日のAM受付を他スタッフから選ぶ（月1回まで・均等に）</li>
-      <li>候補選定時は固定休曜日早見表（0-D）を参照し、◎グループ（固定休曜日非該当）を優先する</li>
-      <li>◎グループが0人の場合のみ△グループから割り当て、「固定休曜日だが他候補なし」と明記する</li>
-      <li>特記事項で水曜AM受付不可のスタッフがいる場合は適用する</li>
-      <li>連日回避・同週1回制限を確認してから割り当てる</li>
-    </ul>
-    <p><strong>✅ステップ2完了と明記してからステップ3へ進む</strong></p>
-  </section>
-
-  <!-- ステップ3 -->
-  <section class="block step" id="sec-step3">
-    <h2><span class="tag step">STEP 3</span> 平日PM受付を割り当てる</h2>
-    <div class="rule-abs">
-      <strong>★【ステップ3 事前確認・絶対厳守】</strong><br>
-      各日のPM担当候補を作成する前に、必ずステップ0-Aの「受付不可」スタッフを除外してから候補リストを作成すること。0-Aで「✕」と分類されたスタッフを候補に挙げることを禁止する。特に以下は見落とし頻度が高いため明示する：
-      <ul>
-        <li>荒井の平日AM(12:45)または12:45日 → AM・PM両方受付不可</li>
-        <li>各スタッフの休・有休・AM(12:45)または12:45平日 → 受付不可</li>
-      </ul>
-    </div>
-
-    <h3>候補リスト作成の手順</h3>
-    <ol>
-      <li>0-Aから当日「✕（受付不可）」のスタッフを除外（休・有休・AM(12:45)または12:45平日・荒井の平日AM(12:45)または12:45日等）</li>
-      <li>週カウント超過スタッフを除外</li>
-      <li>月上限到達スタッフを除外</li>
-      <li>連日・前週同曜日不可スタッフを除外</li>
-      <li>残った候補を以下の2グループに分類する：◎グループ（固定休曜日に該当しないスタッフ）／△グループ（固定休曜日に該当するスタッフ、ただし勤務表は「○」であること）</li>
-      <li>◎グループが1人以上いれば◎グループから割り当てる。◎グループが0人の場合のみ△グループから割り当て、「固定休曜日だが他候補なし」と明記する</li>
-    </ol>
-    <p>この①〜⑥の手順を毎日必ず書き出してから割り当てること。</p>
-
-    <div class="rule-abs">
-      <strong>★事前確認（必須）</strong>：ステップ0-B2で作成した「PM担当が必要な全日リスト」を参照し、全平日のPM担当欄を埋めること。1日でも空欄が残った場合はエラーとして必ず修正してから次のステップに進む。
-    </div>
-
-    <ul>
-      <li>割り当てのたびに対象スタッフの週別カウントを更新し同一週2回にならないか確認してから確定する</li>
-      <li>「17:45までまたは17:45」の日は負荷0.5、「AM半日またはAM」「休」など他の日は負荷1.0として計算する</li>
-      <li>金曜PM担当は男性スタッフのみ（女性スタッフは禁止）</li>
-      <li>連日回避・同週1回制限を確認してから割り当てる</li>
-      <li>0-Cで特定した前週同曜日不可を適用する</li>
-    </ul>
-
-    <h3>週別カウント管理表（割り当てるたびに更新）</h3>
-    <table>
-      <tbody>
-        <tr><td>第1週</td><td>各スタッフの受付回数を記録</td></tr>
-        <tr><td>第2週</td><td>各スタッフの受付回数を記録</td></tr>
-        <tr><td>第3週</td><td>各スタッフの受付回数を記録</td></tr>
-        <tr><td>第4週</td><td>各スタッフの受付回数を記録</td></tr>
-        <tr><td>第5週</td><td>各スタッフの受付回数を記録</td></tr>
-      </tbody>
-    </table>
-    <p>※5週に満たない月は該当週のみ記録</p>
-
-    <p><strong>✅ステップ3完了と明記してからステップ4へ進む</strong></p>
-  </section>
-
-  <!-- ステップ4 -->
-  <section class="block step" id="sec-step4">
-    <h2><span class="tag step">STEP 4</span> 全スタッフの集計を行い上限超過がないか確認する</h2>
-    <ul>
-      <li>集計項目：受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数</li>
-      <li>受付回数が月3回以下（佐藤除く）</li>
-      <li>総負荷量が3.0以下（佐藤除く）</li>
-      <li>土曜受付が月1回以下（佐藤除く）</li>
-      <li>残り番が月1回以下</li>
-      <li>金曜PMに女性スタッフが入っていない</li>
-      <li>同一週に同一スタッフが2回以上受付担当になっていない</li>
-      <li>連日で同一スタッフが受付担当になっていない</li>
-      <li>AM(12:45)または12:45の平日に受付が割り当てられていない</li>
-      <li>佐藤が出勤している土曜（○またはAM(12:45)または12:45）に佐藤が受付担当になっているか</li>
-      <li>平日に1日もPM担当が空欄になっていないか（空欄がある場合はエラーとして修正する）</li>
-      <li>固定休曜日ルールの適用状況を確認する
-        <ul>
-          <li>→「△グループから割り当てた日」がある場合、その日付・スタッフ・理由を一覧で明記する</li>
-          <li>→「休」のスタッフに誤って割り当てていないか再確認する</li>
-        </ul>
-      </li>
-    </ul>
-    <p><strong>✅ステップ4完了と明記してから出力へ進む</strong></p>
-  </section>
-
-  <!-- 出力形式 -->
-  <section class="block output" id="sec-output">
-    <h2>🖨️ 出力形式（必須）</h2>
-    <ul>
-      <li>必ず「●●年●月」として描画すること</li>
-      <li>カレンダーは月初1日から月末最終日で終わること</li>
-      <li>月〜日の7列、週ごとに行を分けた表形式で描画する</li>
-      <li>平日：「AM：担当名」「PM：担当名」</li>
-      <li>土曜：「AM：担当名」「残り：担当名」</li>
-      <li>日曜：「休診」</li>
-      <li>佐藤が「17:45までまたは17:45」勤務の日のPM担当のみ「※短時間(0.5)」を補足表示する</li>
-      <li>カレンダーの下に月末集計表を表示する（受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数）</li>
-      <li>固定休曜日ルールを緩和した日がある場合はカレンダー下部に【固定休緩和注記一覧】として明記する</li>
-    </ul>
-  </section>
-
-  <!-- 自己チェック -->
-  <section class="block selfcheck" id="sec-selfcheck">
-    <h2>✅ 自己チェック（出力後に必ず確認）</h2>
-    <div class="rule-abs">
-      <strong>★【自己チェックの実施方式（絶対厳守）】</strong><br>
-      自己チェックは「割り当てたつもり」で確認することを禁止する。必ず最終カレンダーの各日付を1行ずつ読み上げながら該当スタッフ名と照合し、違反がないことを確認してから✅を記入すること。
-    </div>
-
-    <div class="checklist">
-      <label><input type="checkbox" disabled> カレンダーの年月・開始日・終了日が正しいか</label>
-      <label><input type="checkbox" disabled> 土曜・日曜（休診）の日付が正しいか</label>
-      <label><input type="checkbox" disabled> 荒井の平日AM(12:45)または12:45日に受付が割り当てられていないか（該当日を1日ずつカレンダーと照合すること／今月該当日は作成月ごとに記載／各日のAM欄・PM欄の両方に荒井の名前がないことをカレンダーから目視で確認し、1日ごとに「✅●/●なし」と明記すること）</label>
-      <label><input type="checkbox" disabled> 特記事項（MUST）がすべて反映されているか</label>
-      <label><input type="checkbox" disabled> 受付回数0回のスタッフがいる場合、理由を明記する</label>
-      <label><input type="checkbox" disabled> 各スタッフの出勤日数と受付回数の比率が極端に偏っていないか確認する</label>
-      <label><input type="checkbox" disabled> 月3回・負荷3.0の上限を超えているスタッフがいないか</label>
-      <label><input type="checkbox" disabled> 金曜PMに女性スタッフが割り当てられていないか</label>
-      <label><input type="checkbox" disabled> 同一週（月〜土）内に同じスタッフが2回以上受付担当になっていないか</label>
-      <label><input type="checkbox" disabled> 連日で同じスタッフが受付担当になっていないか</label>
-      <label><input type="checkbox" disabled> 佐藤が出勤している土曜（○またはAM(12:45)または12:45）に佐藤が受付担当になっているか</label>
-      <label><input type="checkbox" disabled> 佐藤以外の土曜受付が月1回以下か</label>
-      <label><input type="checkbox" disabled> 佐藤が複数の土曜に受付担当のとき、残り番の兼任・他者担当の振り分けが正しいか</label>
-      <label><input type="checkbox" disabled> 同月内に残り番が2回以上のスタッフがいないか</label>
-      <label><input type="checkbox" disabled> 「※短時間(0.5)」が付いている日が「17:45までまたは17:45」の日のみであるか</label>
-      <label><input type="checkbox" disabled> 週別カウント管理表を最終出力し、全スタッフの週別受付回数が1回以下であることを確認する</label>
-      <label><input type="checkbox" disabled> 平日（月〜金）の全日にPM担当が記載されているか（0-B2リストと最終カレンダーを1日ずつ照合し、1日ごとに「✅●/●担当名あり」と明記すること／1日でも空欄があればエラーとして修正する）</label>
-      <label><input type="checkbox" disabled> 固定休曜日ルールが正しく適用されているか（「○出勤」の固定休曜日スタッフが、◎グループ候補がいるにもかかわらず割り当てられていないか確認する／「休」の固定休曜日スタッフに誤って割り当てていないか確認する／△グループから割り当てた場合は全件「固定休緩和注記一覧」に記載されているか確認する）</label>
-    </div>
-  </section>
-
-  <footer>
-    受付担当表作成プロンプト — HTML変換版
-  </footer>
+  </div>
 
 </div>
-</body>
-</html>
+
+<script>
+function buildPrompt() {
+  const month  = document.getElementById('month').value.trim();
+  const kinmu  = document.getElementById('kinmu').value.trim();
+  const jisseki = document.getElementById('jisseki').value.trim();
+  const biko   = document.getElementById('biko').value.trim();
+
+  const bikoSection = biko
+    ? `\n【今月の特記事項・調整依頼】（以下は固定ルールより優先して反映してください）\n${biko}\n`
+    : '';
+
+  return `以下の情報をもとに、${month}の受付担当表を作成してください。
+${bikoSection}
+【勤務表】
+${kinmu}
+
+【先月の平日受付実績・土曜年間累計】
+${jisseki}
+
+【固定ルール】
+■ スタッフ情報
+・受付担当対象スタッフ：荒井・関根・目黒・久保・新井・内田・森田・大貫・宮田・遠藤・佐藤
+・中村は平日・土曜を問わず受付担当・残り番ともに割り当てない（妊娠中のため配慮）
+・佐藤は受付業務担当者のため、回数均等化・月3回上限・総負荷量上限の対象外
+・男性スタッフ：荒井・新井・関根・内田・宮田・久保・森田
+・女性スタッフ：目黒・佐藤・遠藤・大貫
+
+■ 勤務表の読み方
+・〇＝出勤（AM・PM両方受付可）
+・休・特休・欠勤・有休・子休＝休み（受付不可）
+・AM有休＝午前休み（PM受付のみ可）
+・PM有休＝午後休み（AM受付のみ可）
+・AM半日＝午前のみ勤務（AM受付可・PM受付不可）
+・PM半日＝午後のみ勤務（AM受付不可・PM受付可）
+・AM(12:45)＝平日は午前・午後ともに受付不可。土曜日のみ受付可
+・17:45まで＝佐藤のみの特殊勤務区分。AM受付可・PM受付は他スタッフが担当（負荷0.5）
+  ※「AM半日」「AM(12:45)」など他の勤務種別とは別物。勤務表に「17:45まで」と明記された日のみ適用。
+  ※「AM半日」の日のPM受付は短時間(0.5)ではなく通常の負荷1.0として扱う。
+・日曜＝休診（受付不要）
+
+■ 平日AM受付
+・佐藤が出勤している日（AM半日・17:45まで）は佐藤がAM担当
+・佐藤が休みまたはAM(12:45)の日は他スタッフがAM担当（月1回まで・均等に）
+
+■ 平日PM受付
+・PM受付は常に佐藤以外が担当
+・佐藤が「17:45まで」勤務の日のみ、PM担当の負荷を0.5とする（短時間扱い）
+・佐藤が「AM半日」勤務の日のPM担当は通常通り負荷1.0とする
+・金曜のPM受付は男性スタッフのみ（女性スタッフは金曜PM担当不可）
+・短時間受付(0.5)が特定スタッフに偏らないよう配慮
+
+■ 土曜受付
+・土曜はAM受付のみ（PM受付なし）
+・土曜のAM(12:45)勤務は受付担当可能
+・佐藤は月2回程度担当
+・前週土曜が休みだったスタッフは翌週土曜の受付担当を避ける（受付のみ適用。残り番には適用しない）
+
+■ 土曜残り番
+・1日につき1人を割り当て
+・荒井は土曜が休みのため対象外
+・佐藤が土曜受付を担当した日のうち、その月の1回目は佐藤が残り番を兼任する
+・佐藤が土曜受付を担当した日のうち、その月の2回目は佐藤以外のスタッフが残り番を担当する（佐藤の残り番は月1回が上限のため）
+・佐藤以外のスタッフが土曜受付を担当した日は、その担当者が残り番も兼任する
+・同じスタッフが同月内に残り番を2回担当しない（佐藤・佐藤以外ともに上限1回）
+
+■ 回数・負荷量の上限（厳守）
+・同一スタッフの受付担当回数は土曜含めて月3回まで（佐藤は対象外）
+・総負荷量の上限は土曜含めて3.0（佐藤は対象外・超過禁止）
+・負荷量：AM受付1.0、PM受付1.0、17:45以降PM受付0.5（※「17:45まで」勤務の日のみ）、土曜AM受付1.0
+
+■ 割り当て全般
+・受付担当・残り番ともに出勤日のみ割り当て可能
+・同一スタッフの受付担当は同一週（月〜土）内に1回まで（佐藤は対象外）
+・前週と同じ曜日の担当にならないようにする（佐藤は対象外）
+・連日（前日または翌日）に同じスタッフを受付担当にしない
+・同一スタッフが同日にAM受付とPM受付を両方担当しない
+
+■ 作成手順（必ず守ること）
+ステップ0：全スタッフの日付ごと出勤状況（AM可/PM可/受付不可）を一覧化してから割り当てを開始する
+　　　　　　あわせて佐藤の勤務種別を日付ごとに確認し「17:45まで」に該当する日を明示する
+ステップ1：土曜受付・残り番を決定する
+ステップ2：佐藤不在のAM受付担当日を特定し担当者を決める
+ステップ3：平日PM受付を上限・曜日ルールを守りながら割り当てる
+　　　　　　「17:45まで」の日は負荷0.5、それ以外（AM半日など）は負荷1.0として計算する
+ステップ4：全スタッフの集計を行い上限超過がないか確認する
+
+■ 出力形式（必須）
+・必ずインタラクティブなカレンダー形式（ビジュアル）で出力すること。テキストのみの出力は不可。
+・月〜日の7列、週ごとに行を分けたカレンダーウィジェットとして描画する
+・平日：「AM：担当名」「PM：担当名」
+・土曜：「AM：担当名」「残り：担当名」
+・日曜：「休診」
+・佐藤が「17:45まで」勤務の日のPM担当のみ「※短時間(0.5)」を補足表示する
+・カレンダーの下に月末集計表（受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数）を表示する
+
+■ 自己チェック（出力後に必ず確認）
+・受付回数0回のスタッフがいる場合、理由（全日休みか割り当てミスか）を明記する
+・各スタッフの出勤日数と受付回数の比率が極端に偏っていないか確認する
+・月3回・負荷3.0の上限を超えているスタッフがいないか確認する
+・金曜PMに女性スタッフ（目黒・遠藤・大貫）が割り当てられていないか確認する
+・同一週（月〜土）内に同じスタッフが2回以上受付担当になっていないか確認する
+・連日で同じスタッフが受付担当になっていないか確認する
+・佐藤が土曜受付2回目の日の残り番が佐藤以外になっているか確認する
+・「※短時間(0.5)」が付いている日が、勤務表で佐藤が「17:45まで」と記載された日のみであることを確認する`;
+}
+
+function openClaude() {
+  const err = document.getElementById('err');
+  err.className = 'err';
+  const month  = document.getElementById('month').value.trim();
+  const kinmu  = document.getElementById('kinmu').value.trim();
+  const jisseki = document.getElementById('jisseki').value.trim();
+  if (!month)   { err.textContent = '対象月を入力してください。';       err.className = 'err show'; return; }
+  if (!kinmu)   { err.textContent = '勤務表を貼り付けてください。';     err.className = 'err show'; return; }
+  if (!jisseki) { err.textContent = '先月の実績テキストを貼り付けてください。'; err.className = 'err show'; return; }
+
+  const prompt = buildPrompt();
+  const url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
+  window.open(url, '_blank', 'noopener,noreferrer');
+
+  const btn = document.getElementById('btn');
+  btn.textContent = '✅ Claude.ai を開きました';
+  btn.className = 'btn-main done';
+  document.getElementById('step-box').style.display = 'block';
+  setTimeout(() => {
+    btn.textContent = 'Claude でそのまま担当表を作成する →';
+    btn.className = 'btn-main';
+  }, 5000);
+}
+</script>
 </body>
 </html>
