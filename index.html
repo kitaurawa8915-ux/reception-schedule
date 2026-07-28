@@ -24,7 +24,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sa
 .btn-ext:hover{opacity:0.82;}
 .btn-ext svg{width:15px;height:15px;flex-shrink:0;}
 .btn-gem{background:#1a73e8;color:#fff;}
-.btn-drive{background:#34a853;color:#fff;}
 .ext-hint{font-size:11px;color:#888;}
 
 input[type=text]{font-size:13px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#1a1a1a;outline:none;width:220px;}
@@ -43,8 +42,6 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 
 .err{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;color:#c0392b;font-size:12px;margin-top:10px;display:none;}
 .err.show{display:block;}
-
-/* 変更点ハイライト用（開発確認用・本番では外してOK） */
 </style>
 </head>
 <body>
@@ -67,7 +64,7 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
     <div class="card-title"><span class="num">2</span>勤務表</div>
     <div class="ext-row">
       <a class="btn-ext btn-gem"
-         href="https://gemini.google.com/gem/1gfP2szCGStxbQgmN8ZSn8AS116F0XAOY"
+         href="https://gemini.google.com/gem/b7053c370f66"
          target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
@@ -78,22 +75,21 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
     </div>
     <p class="hint">Gemで変換したテキストをそのまま貼り付けてください。</p>
     <textarea id="kinmu" placeholder="荒井
-6/1 ○
-6/2 ○
-6/3 ○
+7/1 ○
+7/2 ○
 ...
 佐藤
-6/1 AM半日
-6/2 17:45まで
+7/1 AM半日
+7/2 17:45まで
 ..."></textarea>
   </div>
 
-  <!-- ③ 実績入力 -->
+  <!-- ③ 先月の実績 & 土曜年間累計 -->
   <div class="card">
     <div class="card-title"><span class="num">3</span>先月の実績 ＆ 土曜年間累計</div>
     <div class="ext-row">
       <a class="btn-ext btn-gem"
-         href="https://gemini.google.com/gem/cc4662ec277d"
+         href="https://gemini.google.com/gem/b7053c370f66"
          target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
@@ -114,9 +110,33 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 ..."></textarea>
   </div>
 
-  <!-- ④ 特記事項 -->
+  <!-- ④ 前月末から1週間受付担当一覧 -->
   <div class="card">
-    <div class="card-title"><span class="num">4</span>今月の特記事項・調整依頼（任意）</div>
+    <div class="card-title"><span class="num">4</span>前月末から1週間受付担当一覧</div>
+    <div class="ext-row">
+      <a class="btn-ext btn-gem"
+         href="https://gemini.google.com/gem/b7053c370f66"
+         target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 8 8 2 12C8 16 12 22 12 22C12 22 16 16 22 12C16 8 12 2 12 2Z" fill="white"/>
+        </svg>
+        Gemで担当一覧を変換する
+      </a>
+      <span class="ext-hint">↑ 前月末の担当表画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
+    </div>
+    <p class="hint">今月第1週の「前週同曜日不可」制約に使用します。前月末から日曜までの1週間分を入力してください。</p>
+    <textarea id="lastweek" style="min-height:130px;" placeholder="6/24（水） AM：佐藤 / PM：関根
+6/25（木） AM：佐藤 / PM：新井
+6/26（金） AM：大貫 / PM：宮田
+6/27（土） AM：佐藤 / PM：なし
+6/28（日） AM：なし / PM：なし
+6/29（月） AM：佐藤 / PM：遠藤
+6/30（火） AM：佐藤 / PM：目黒"></textarea>
+  </div>
+
+  <!-- ⑤ 今月の特記事項 -->
+  <div class="card">
+    <div class="card-title"><span class="num">5</span>今月の特記事項・調整依頼（任意）</div>
     <p class="hint">固定ルールより優先して反映されます。記載がない場合は空欄のままで構いません。</p>
     <textarea id="biko" style="min-height:100px;" placeholder="例：
 ・宮田・久保は外勤があるため今月の受付担当は1回までに抑える
@@ -144,13 +164,18 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 
 <script>
 function buildPrompt() {
-  const month  = document.getElementById('month').value.trim();
-  const kinmu  = document.getElementById('kinmu').value.trim();
-  const jisseki = document.getElementById('jisseki').value.trim();
-  const biko   = document.getElementById('biko').value.trim();
+  const month    = document.getElementById('month').value.trim();
+  const kinmu    = document.getElementById('kinmu').value.trim();
+  const jisseki  = document.getElementById('jisseki').value.trim();
+  const lastweek = document.getElementById('lastweek').value.trim();
+  const biko     = document.getElementById('biko').value.trim();
 
   const bikoSection = biko
     ? `\n【今月の特記事項・調整依頼】（以下は固定ルールより優先して反映してください）\n${biko}\n`
+    : '';
+
+  const lastweekSection = lastweek
+    ? `\n【前月末から1週間受付担当一覧】\n${lastweek}\n`
     : '';
 
   return `以下の情報をもとに、${month}の受付担当表を作成してください。
@@ -160,7 +185,7 @@ ${kinmu}
 
 【先月の平日受付実績・土曜年間累計】
 ${jisseki}
-
+${lastweekSection}
 【固定ルール】
 ■ スタッフ情報
 ・受付担当対象スタッフ：荒井・関根・目黒・久保・新井・内田・森田・大貫・宮田・遠藤・佐藤
@@ -219,9 +244,33 @@ ${jisseki}
 ・連日（前日または翌日）に同じスタッフを受付担当にしない
 ・同一スタッフが同日にAM受付とPM受付を両方担当しない
 
+■ 制約の優先順位・強度
+
+【絶対厳守（いかなる場合も緩めない）】
+・月3回・負荷3.0の上限超過禁止
+・金曜PM女性スタッフ割り当て禁止
+・同日AM・PM両方を同一スタッフに割り当て禁止
+・中村への割り当て禁止
+・残り番の同月2回禁止
+・土曜「前週休みスタッフは翌週受付不可」
+
+【原則厳守（詰まった場合のみ緩める・その場合は理由を明記）】
+・前週同曜日回避
+  → 緩める条件①：出勤可能者が他にいない場合のみ
+  → 緩める条件②：金曜PM担当可能な男性スタッフが前週同曜日回避で全員不可になった場合
+・連日回避と同週1回制限は両方必ず満たすこと
+
+【方針】
+・回数・負荷の均等化は「少ない人を増やす」方向で調整する
+
+■ 特記事項の強度解釈
+・「必ず」と記載された特記事項はMust（絶対厳守）
+・「可能な範囲で」と記載された特記事項はHave to（最大限努力するが、他の絶対厳守ルールと競合する場合は他を優先してよい）
+
 ■ 作成手順（必ず守ること）
 ステップ0：全スタッフの日付ごと出勤状況（AM可/PM可/受付不可）を一覧化してから割り当てを開始する
 　　　　　　あわせて佐藤の勤務種別を日付ごとに確認し「17:45まで」に該当する日を明示する
+　　　　　　前月末から1週間受付担当一覧を確認し、今月第1週の「前週同曜日不可」制約に反映する
 ステップ1：土曜受付・残り番を決定する
 ステップ2：佐藤不在のAM受付担当日を特定し担当者を決める
 ステップ3：平日PM受付を上限・曜日ルールを守りながら割り当てる
@@ -251,11 +300,13 @@ ${jisseki}
 function openClaude() {
   const err = document.getElementById('err');
   err.className = 'err';
-  const month  = document.getElementById('month').value.trim();
-  const kinmu  = document.getElementById('kinmu').value.trim();
-  const jisseki = document.getElementById('jisseki').value.trim();
-  if (!month)   { err.textContent = '対象月を入力してください。';       err.className = 'err show'; return; }
-  if (!kinmu)   { err.textContent = '勤務表を貼り付けてください。';     err.className = 'err show'; return; }
+
+  const month    = document.getElementById('month').value.trim();
+  const kinmu    = document.getElementById('kinmu').value.trim();
+  const jisseki  = document.getElementById('jisseki').value.trim();
+
+  if (!month)   { err.textContent = '対象月を入力してください。';             err.className = 'err show'; return; }
+  if (!kinmu)   { err.textContent = '勤務表を貼り付けてください。';           err.className = 'err show'; return; }
   if (!jisseki) { err.textContent = '先月の実績テキストを貼り付けてください。'; err.className = 'err show'; return; }
 
   const prompt = buildPrompt();
@@ -272,5 +323,7 @@ function openClaude() {
   }, 5000);
 }
 </script>
+</body>
+</html>
 </body>
 </html>
