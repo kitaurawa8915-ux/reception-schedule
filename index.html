@@ -42,6 +42,13 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 
 .err{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;color:#c0392b;font-size:12px;margin-top:10px;display:none;}
 .err.show{display:block;}
+
+.fallback-box{background:#fff8e1;border:1px solid #f9a825;border-radius:10px;padding:16px 20px;margin-top:16px;display:none;}
+.fallback-box h3{font-size:13px;font-weight:600;color:#c07d00;margin-bottom:10px;}
+.fallback-box textarea{min-height:200px;font-size:11px;}
+.btn-copy{margin-top:10px;padding:10px 18px;font-size:13px;font-weight:600;border:none;border-radius:8px;background:#f9a825;color:#fff;cursor:pointer;}
+.btn-copy:hover{opacity:0.85;}
+.btn-copy.copied{background:#2e7d32;}
 </style>
 </head>
 <body>
@@ -80,7 +87,7 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 ...
 佐藤
 7/1 AM半日またはAM
-7/2 17:45までまたは17:45
+7/2 18:15までまたは18:15
 ..."></textarea>
   </div>
 
@@ -126,7 +133,7 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
       </a>
       <span class="ext-hint">↑ 前月末の担当表画像を貼り付けてテキスト化 → 下の欄にコピペ</span>
     </div>
-    <p class="hint">今月第1週の「前週同曜日不可」制約に使用します。前月最終週（月〜土）の1週間分を入力してください。</p>
+    <p class="hint">今月第1週の「前週同曜日不可」制約に使用します。前月最終週（月~土）の1週間分を入力してください。</p>
     <textarea id="lastweek" style="min-height:130px;" placeholder="6/24(水) AM:佐藤 PM:関根
 6/25(木) AM:佐藤 PM:新井
 6/26(金) AM:大貫 PM:宮田
@@ -137,7 +144,9 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
   <div class="card">
     <div class="card-title"><span class="num">5</span>今月の特記事項・調整依頼（任意）</div>
     <p class="hint">固定ルールより優先して反映されます。記載がない場合は空欄のままで構いません。</p>
-    <p class="hint" style="background:#fff8e1;border-left:3px solid #f9a825;padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px;">💡 <strong>タグで適用の強さが変わります</strong><br>先頭に「<strong>【MUST】</strong>」と書く → 絶対厳守（固定ルールと同等の優先度で必ず守る）<br>先頭に「<strong>【HAVE TO】</strong>」と書く → 最大限努力（他の絶対厳守ルールと競合する場合は他を優先）</p>
+    <p class="hint" style="background:#fff8e1;border-left:3px solid #f9a825;padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px;">💡 <strong>タグで適用の強さが変わります</strong>
+先頭に「<strong>【MUST】</strong>」と書く → 絶対厳守（固定ルールと同等の優先度で必ず守る）
+先頭に「<strong>【HAVE TO】</strong>」と書く → 最大限努力（他の絶対厳守ルールと競合する場合は他を優先）</p>
     <textarea id="biko" style="min-height:130px;" placeholder="記載例
 【MUST】7月12日(土) 新井を受付担当にしてください
 【HAVE TO】新井・久保の水曜日のAM受付なし"></textarea>
@@ -151,12 +160,19 @@ textarea:focus{border-color:#2e7d32;background:#fff;}
 
   <!-- 開いた後の案内 -->
   <div class="step-box" id="step-box">
-    <h3>✅ Claude.ai が開きました！</h3>
+    <h3>✅ プロンプトをコピーしました！</h3>
     <ol>
-      <li>プロンプトがチャット欄に入力済みです</li>
-      <li>送信ボタン（↑）を押すだけで担当表が作成されます</li>
-      <li>生成された担当表をそのまま確認・共有できます</li>
+      <li>新しいタブで Claude.ai が開きます</li>
+      <li>チャット入力欄をクリックして <strong>Ctrl+V</strong>（Macは <strong>⌘+V</strong>）で貼り付けてください</li>
+      <li>送信ボタン（↑）を押すと担当表が作成されます</li>
     </ol>
+  </div>
+
+  <!-- クリップボードが使えない場合の手動コピー欄 -->
+  <div class="fallback-box" id="fallback-box">
+    <h3>⚠️ 自動コピーができませんでした。手動でコピーしてください</h3>
+    <textarea id="fallback-text" readonly onclick="this.select()"></textarea>
+    <button class="btn-copy" id="copy-btn" onclick="manualCopy()">この内容をコピー</button>
   </div>
 
 </div>
@@ -200,9 +216,9 @@ ${lastweekSection}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【週の定義と同週1回制限（絶対厳守）】
-・「週」は必ず月曜〜土曜として定義する（日曜は休診のため対象外）
-・月初・月末で月曜〜土曜が揃わない週は存在する日付のみを対象とする
-　例：月初が水曜の場合、第1週は「水〜土」のみ
+・「週」は必ず月曜~土曜として定義する（日曜は休診のため対象外）
+・月初・月末で月曜~土曜が揃わない週は存在する日付のみを対象とする
+　例：月初が水曜の場合、第1週は「水~土」のみ
 ・1人のスタッフに割り当てるたびに週カウントを+1し、すでに1回あれば割り当て禁止（佐藤除く）
 ・週カウント確認をスキップして割り当てることを禁止する
 
@@ -219,13 +235,13 @@ ${lastweekSection}
 
 勤務種別　　　　　　AM受付　　　　　　　　　PM受付　　　　　PM負荷
 AM半日またはAM　　　佐藤が担当　　　　　　　不可→他者担当　 1.0
-17:45までまたは17:45佐藤が担当　　　　　　　不可→他者担当　 0.5
+18:15までまたは18:15佐藤が担当　　　　　　　不可→他者担当　 0.5
 AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　　 —
 　　　　　　　　　　【土曜】佐藤が受付担当　 不可　　　　　　 —
 休　　　　　　　　　不可　　　　　　　　　　 不可　　　　　　 —
 
-★「AM半日またはAM」も「17:45までまたは17:45」も、PMは必ず佐藤以外のスタッフが担当する。どちらの場合もPM担当を空欄にすることは禁止。
-★両者の唯一の違いはPM負荷のみ。AM半日またはAM→PM担当の負荷1.0／17:45までまたは17:45→PM担当の負荷0.5。この2種別を混同することを禁止する。
+★「AM半日またはAM」も「18:15までまたは18:15」も、PMは必ず佐藤以外のスタッフが担当する。どちらの場合もPM担当を空欄にすることは禁止。
+★両者の唯一の違いはPM負荷のみ。AM半日またはAM→PM担当の負荷1.0／18:15までまたは18:15→PM担当の負荷0.5。この2種別を混同することを禁止する。
 ★佐藤の土曜AM(12:45)または12:45は「出勤」扱いとする。
 　→佐藤が土曜にAM(12:45)または12:45の場合は佐藤が受付を担当する。
 　→残り番は別途他スタッフ1名を割り当てる。
@@ -272,19 +288,19 @@ AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　
 ・PM半日　　　　　　　　= 午後のみ勤務（AM受付不可・PM受付可）
 ・AM(12:45)または12:45　= 平日は午前・午後ともに受付不可。土曜日のみAM受付可。
 　　　　　　　　　　　　 佐藤が土曜にAM(12:45)または12:45の場合は佐藤が受付担当。佐藤以外のスタッフが土曜にこの区分の場合も受付担当可能。
-・17:45までまたは17:45　= 佐藤のみの特殊勤務区分。佐藤がAMを担当し、PMは必ず他者が担当する。PM担当の負荷は0.5。「AM半日またはAM」との違いはPM負荷のみ。混同禁止。
+・18:15までまたは18:15　= 佐藤のみの特殊勤務区分。佐藤がAMを担当し、PMは必ず他者が担当する。PM担当の負荷は0.5。「AM半日またはAM」との違いはPM負荷のみ。混同禁止。
 ・日曜　　　　　　　　　= 休診（受付不要）
 
-★平日（月〜金）はAM・PMともに必ず受付担当を置くこと。PM担当が空欄になる平日が発生した場合はエラーとして修正する。ただし、佐藤が「休」または「AM(12:45)または12:45」かつ出勤可能な他スタッフが誰もいない場合のみPMなしが正当（理由を明記）。
+★平日（月~金）はAM・PMともに必ず受付担当を置くこと。PM担当が空欄になる平日が発生した場合はエラーとして修正する。ただし、佐藤が「休」または「AM(12:45)または12:45」かつ出勤可能な他スタッフが誰もいない場合のみPMなしが正当（理由を明記）。
 
 ■ 平日AM受付
-・佐藤が出勤している日（AM半日またはAM・17:45までまたは17:45）は佐藤がAM担当
+・佐藤が出勤している日（AM半日またはAM・18:15までまたは18:15）は佐藤がAM担当
 ・佐藤が休みまたはAM(12:45)または12:45の日は他スタッフがAM担当（月1回まで・均等に）
 
 ■ 平日PM受付
 ・PM受付は常に佐藤以外が担当
 ・佐藤の勤務種別にかかわらず、平日は毎日PM担当を置く
-・佐藤が「17:45までまたは17:45」勤務の日のみ、PM担当の負荷を0.5とする
+・佐藤が「18:15までまたは18:15」勤務の日のみ、PM担当の負荷を0.5とする
 ・佐藤が「AM半日またはAM」勤務の日のPM担当の負荷は1.0
 ・佐藤が「休」の日のPM担当の負荷は1.0
 ・金曜のPM受付は男性スタッフのみ（女性スタッフは金曜PM担当不可）
@@ -307,11 +323,11 @@ AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　
 ■ 回数・負荷量の上限（絶対厳守）
 ・同一スタッフの受付担当回数は土曜含めて月3回まで（佐藤は対象外）
 ・総負荷量の上限は土曜含めて3.0（佐藤は対象外・超過禁止）
-・負荷量：AM受付1.0、PM受付1.0、17:45以降PM受付0.5（「17:45までまたは17:45」勤務日のみ）、土曜AM受付1.0
+・負荷量：AM受付1.0、PM受付1.0、18:15以降PM受付0.5（「18:15までまたは18:15」勤務日のみ）、土曜AM受付1.0
 
 ■ 割り当て全般
 ・受付担当・残り番ともに出勤日のみ割り当て可能
-・同一スタッフの受付担当は同一週（月〜土）内に1回まで（佐藤は対象外）
+・同一スタッフの受付担当は同一週（月~土）内に1回まで（佐藤は対象外）
 ・前週と同じ曜日の担当にならないようにする（佐藤は対象外）
 ・連日（前日または翌日）に同じスタッフを受付担当にしない
 ・同一スタッフが同日にAM受付とPM受付を両方担当しない
@@ -349,7 +365,7 @@ AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　
 
 ステップ0：以下の一覧を必ずテキストとして書き出す
 【0-A】全スタッフ×全日付の出勤可否マトリクス（AM可／PM可／受付不可）。「AM(12:45)または12:45は平日受付不可」「休・有休等は受付不可」を必ず適用してから分類する。佐藤は出勤種別を日付ごとに明記する。固定休曜日に該当する日は「△（固定休曜日・優先度低）」と注記する（ただし勤務表が「休」の場合は「受付不可」のまま）。
-【0-B】佐藤の「17:45までまたは17:45」該当日リスト
+【0-B】佐藤の「18:15までまたは18:15」該当日リスト
 【0-B2】平日PM担当が必要な全日リスト（各日の佐藤の勤務種別とPM負荷を明記。「PMなし」は佐藤が「休」または「AM(12:45)」かつ出勤可能な他スタッフが0人の場合のみ）
 【0-C】前週同曜日不可リスト（今月第1週分。前月末から1週間受付担当一覧をもとに作成）
 【0-D】固定休曜日早見表（当月分。勤務表で「休」の場合は固定休曜日注記は不要）
@@ -391,11 +407,11 @@ AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　
 【出力形式（必須）】
 ・必ず「●●年●月」として描画すること
 ・カレンダーは月初1日から月末最終日で終わること
-・月〜日の7列、週ごとに行を分けた表形式で描画する
+・月~日の7列、週ごとに行を分けた表形式で描画する
 ・平日：「AM：担当名」「PM：担当名」
 ・土曜：「AM：担当名」「残り：担当名」
 ・日曜：「休診」
-・佐藤が「17:45までまたは17:45」勤務の日のPM担当のみ「※短時間(0.5)」を補足表示する
+・佐藤が「18:15までまたは18:15」勤務の日のPM担当のみ「※短時間(0.5)」を補足表示する
 ・カレンダーの下に月末集計表を表示する（受付回数・総負荷量・土曜受付回数・残り番回数・短時間0.5回数・佐藤不在AM回数）
 ・固定休曜日ルールを緩和した日がある場合はカレンダー下部に【固定休緩和注記一覧】として明記する
 
@@ -413,15 +429,30 @@ AM(12:45)または12:45【平日】不可　　　　　　不可　　　　　
 ・佐藤が出勤している土曜に佐藤が受付担当になっているか、佐藤以外の土曜受付が月1回以下か
 ・佐藤が複数の土曜に受付担当のとき、残り番の兼任・他者担当の振り分けが正しいか
 ・同月内に残り番が2回以上のスタッフがいないか
-・「※短時間(0.5)」が「17:45までまたは17:45」の日のみに付いているか
+・「※短時間(0.5)」が「18:15までまたは18:15」の日のみに付いているか
 ・週別カウント管理表を最終出力し、全スタッフの週別受付回数が1回以下であることを確認する
 ・平日の全日にPM担当が記載されているか（0-B2リストと1日ずつ照合し「✅●/●担当名あり」と明記）
 ・固定休曜日ルールが正しく適用されているか（△グループから割り当てた場合は全件【固定休緩和注記一覧】に記載）`;
 }
 
-function openClaude() {
+function fallbackTextareaCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+async function openClaude() {
   const err = document.getElementById('err');
   err.className = 'err';
+  document.getElementById('fallback-box').style.display = 'none';
 
   const month    = document.getElementById('month').value.trim();
   const kinmu    = document.getElementById('kinmu').value.trim();
@@ -432,19 +463,52 @@ function openClaude() {
   if (!jisseki) { err.textContent = '先月の実績テキストを貼り付けてください。'; err.className = 'err show'; return; }
 
   const prompt = buildPrompt();
-  const url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
-  window.open(url, '_blank', 'noopener,noreferrer');
+
+  // ポップアップブロック回避のため、先にタブを開いておく
+  const newTab = window.open('https://claude.ai/new', '_blank', 'noopener,noreferrer');
+
+  let copied = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(prompt);
+      copied = true;
+    } else {
+      copied = fallbackTextareaCopy(prompt);
+    }
+  } catch (e) {
+    copied = fallbackTextareaCopy(prompt);
+  }
 
   const btn = document.getElementById('btn');
-  btn.textContent = '✅ Claude.ai を開きました';
-  btn.className = 'btn-main done';
-  document.getElementById('step-box').style.display = 'block';
-  setTimeout(() => {
-    btn.textContent = 'Claude でそのまま担当表を作成する →';
-    btn.className = 'btn-main';
-  }, 5000);
+
+  if (copied) {
+    btn.textContent = '✅ コピーしました（Ctrl+V で貼り付け）';
+    btn.className = 'btn-main done';
+    document.getElementById('step-box').style.display = 'block';
+    setTimeout(() => {
+      btn.textContent = 'Claude でそのまま担当表を作成する →';
+      btn.className = 'btn-main';
+    }, 6000);
+  } else {
+    // 自動コピーに失敗した場合は手動コピー欄を表示
+    document.getElementById('fallback-text').value = prompt;
+    document.getElementById('fallback-box').style.display = 'block';
+    document.getElementById('fallback-box').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function manualCopy() {
+  const ta = document.getElementById('fallback-text');
+  ta.select();
+  const ok = fallbackTextareaCopy(ta.value);
+  const btn = document.getElementById('copy-btn');
+  if (ok) {
+    btn.textContent = '✅ コピーしました';
+    btn.className = 'btn-copy copied';
+    setTimeout(() => { btn.textContent = 'この内容をコピー'; btn.className = 'btn-copy'; }, 3000);
+  }
 }
 </script>
 </body>
 </html>
-</html>
+
